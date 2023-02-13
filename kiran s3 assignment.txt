@@ -1,0 +1,45 @@
+"""
+S3 bucket access from Boto3 Sdk Python on Cloud9
+"""
+# assignment          : ICTPRG302
+# Author              : Kiran Kumar Guditi
+# Student ID          : 6BT273TSWF
+# Code Purpose        : To confirm the AWS region and if yes, to give the number and names of S3 buckets with size 
+# Date written        : 10/02/2023
+# changes done        : 13/02/2023
+
+import boto3
+
+
+access_key = 'enter access key'
+secret_key = 'enter secret key'
+
+
+default_region = 'us-east-1'
+user_response = input("Is 'us-east-1' your default region? (yes/no): ")
+
+
+if user_response == 'yes':
+   conn = boto3.client('s3', region_name=default_region, aws_access_key_id=access_key, aws_secret_access_key=secret_key)
+   buckets = conn.list_buckets()['Buckets']
+   num_buckets = len(buckets)
+   print("Great kiran, see the number and names of the buckets in this region:-)")
+   print("Number of Buckets:", num_buckets)
+   output = "Great kiran, see the number and names of the buckets in this region:-)\n"
+   output += "Number of Buckets: " + str(num_buckets) + "\n"
+   for bucket in buckets:
+       s3 = boto3.resource('s3', region_name=default_region)
+       total_bytes = 0
+       name = bucket['Name']
+       b = s3.Bucket(name)
+       for key in b.objects.all():
+           total_bytes += key.size
+       total_bytes = total_bytes / 1024 / 1024 / 1024
+       print("Bucket Name:", name, "Size:", total_bytes, "GB")
+       output += "Bucket Name: " + name + " Size: " + str(total_bytes) + " GB\n"
+   with open("output.txt", "w") as file:
+       file.write(output)
+else:
+   print("Sorry kiran,no buckets in this region :-(")
+   with open("output.txt", "w") as file:
+       file.write("Sorry kiran,no buckets in this region :-(")
